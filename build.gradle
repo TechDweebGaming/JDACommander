@@ -1,0 +1,97 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id 'com.jfrog.bintray' version '1.8.5'
+    id 'maven'
+    id 'maven-publish'
+}
+
+def libVersion = '1.0.0'
+
+group 'io.github.techdweebgaming'
+version libVersion
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'net.dv8tion:JDA:4.2.0_222'
+}
+
+Properties properties = new Properties();
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+shadowJar {
+    exclude 'io/github/techdweebgaming/jdacommander/test/**'
+}
+
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "techdweebgaming"
+            name "techdweebgaming"
+            email "nomail@dontemailme.com"
+        }
+    }
+
+    scm {
+        url "https://github.com/TechDweebGaming/JDACommander"
+    }
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) {
+            project.shadow.component(it)
+            artifact sourcesJar {
+                exclude 'io/github/techdweebgaming/jdacommander/test/**'
+            }
+            artifact javadocJar {
+                exclude 'io/github/techdweebgaming/jdacommander/test/**'
+            }
+            groupId 'io.github.techdweebgaming'
+            artifactId 'jdacommander'
+            version libVersion
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A flexible command library for use with JDA (Java Discord API).')
+                root.appendNode('name', 'JDACommander')
+                root.appendNode('url', 'https://github.com/TechDweebGaming/JDACommander')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+bintray {
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apiKey')
+    pkg {
+        repo = 'JDACommander'
+        name = 'JDACommander'
+        version {
+            name = libVersion
+            released = new Date()
+            vcsTag = libVersion
+        }
+        publications = ['shadow']
+    }
+}
