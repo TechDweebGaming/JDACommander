@@ -10,7 +10,7 @@ public class TestBot {
     public static void main(String[] args) throws LoginException {
         CommandRegistry commandRegistry = new CommandRegistry("!");
 
-        JDA jda = JDABuilder.createDefault("Njk2NTAwMTcxODE4Nzk1MDUw.XopoVQ.SelHRxxuKe2OnA18mlWnuBuwUAw").addEventListeners(commandRegistry).build();
+        JDA jda = JDABuilder.createDefault("HAH No token for you").addEventListeners(commandRegistry).build();
 
         commandRegistry.registerCommand(new TestCommand());
     }
